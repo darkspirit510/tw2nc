@@ -1,0 +1,4 @@
+beautifulsoup4
+caldav
+lxml
+icalendar==3.9.0
