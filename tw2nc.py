@@ -1,4 +1,5 @@
 import caldav
+import sys
 import re
 import urllib.request
 import uuid
@@ -8,19 +9,21 @@ from icalendar import Calendar, Event
 
 DATE_FORMAT = '%d.%m.%Y %H:%M'
 
-sourceUrl = 'http://www.tanzschule-wehke.de/i/events'
+if len(sys.argv) - 1 != 4:
+    print("Usage: tw2nc.py [caldav-url] [username] [password] [calendar-name]")
+    sys.exit(1)
 
-username = ''
-password = ''
-nextcloudUrl = ''
+caldav_url = sys.argv[1]
+username = sys.argv[2]
+password = sys.argv[3]
+calendar_name = sys.argv[4]
 
-calendar_name = 'Tanzschule'
-
+source_url = 'http://www.tanzschule-wehke.de/i/events'
 
 def download_events():
     print("Downloading event page")
 
-    response = urllib.request.urlopen(sourceUrl)
+    response = urllib.request.urlopen(source_url)
     html = response.read()
 
     print("Download successful (%s Bytes)" % len(html))
@@ -56,12 +59,12 @@ def first_event(cal):
     return cal.subcomponents[0]
 
 
-def nextcloud_url():
-    return 'https://%s:%s@%s' % (username, password, nextcloudUrl)
+def authentication_url():
+    return 'https://%s:%s@%s' % (username, password, caldav_url)
 
 
 def target_calendar():
-    client = caldav.DAVClient(nextcloud_url())
+    client = caldav.DAVClient(authentication_url())
     principal = client.principal()
     calendars = principal.calendars()
 
